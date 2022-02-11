@@ -29,7 +29,6 @@ const TEMPLATE = [
 ];
 
 /**
-<<<<<<< HEAD
  * Function that returns a comment structure that will be rendered with default placehoders.
  *
  * @param {Object}  settings                       Discussion Settings.
@@ -80,8 +79,6 @@ const getCommentsPlaceholder = ( {
 };
 
 /**
-=======
->>>>>>> 80a24d8253 (Allow background color again to avoid compatibility errors)
  * Component which renders the inner blocks of the Comment Template.
  *
  * @param {Object} props                    Component props.
