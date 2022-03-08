@@ -249,9 +249,9 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	? ( { enableFSEBlocks } = {} ) => {
 			[
 				// Experimental blocks.
-				homeLink,
 				avatar,
-
+				homeLink,
+				postAuthorName,
 				// Full Site Editing blocks.
 				...( enableFSEBlocks
 					? [
