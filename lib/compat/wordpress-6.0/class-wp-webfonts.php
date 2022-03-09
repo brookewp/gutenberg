@@ -17,7 +17,16 @@ class WP_Webfonts {
 	 * @access private
 	 * @var array
 	 */
-	private static $webfonts = array();
+	private static $registered_webfonts = array();
+
+	/**
+	 * An array of enqueued webfonts.
+	 *
+	 * @static
+	 * @access private
+	 * @var array
+	 */
+	private static $enqueued_webfonts = array();
 
 	/**
 	 * An array of registered providers.
@@ -58,12 +67,21 @@ class WP_Webfonts {
 	}
 
 	/**
-	 * Get the list of fonts.
+	 * Get the list of registered fonts.
 	 *
 	 * @return array
 	 */
-	public function get_fonts() {
-		return self::$webfonts;
+	public function get_registered_fonts() {
+		return self::$registered_webfonts;
+	}
+
+	/**
+	 * Get the list of enqueued fonts.
+	 *
+	 * @return array
+	 */
+	public function get_enqueued_fonts() {
+		return self::$enqueued_webfonts;
 	}
 
 	/**
@@ -78,24 +96,47 @@ class WP_Webfonts {
 	/**
 	 * Register a webfont.
 	 *
-	 * @param array $font The font arguments.
+	 * @param string $id The unique identifier for the webfont.
+	 * @param array  $font The font arguments.
 	 */
-	public function register_font( $font ) {
+	public function register_font( $id, $font ) {
+		if ( ! $id ) {
+			trigger_error( __( 'An ID is necessary when registering a webfont.', 'gutenberg' ) );
+			return false;
+		}
+
 		$font = $this->validate_font( $font );
 		if ( $font ) {
-			$id                    = $this->get_font_id( $font );
-			self::$webfonts[ $id ] = $font;
+			self::$registered_webfonts[ $id ] = $font;
 		}
 	}
 
 	/**
-	 * Get the font ID.
+	 * Enqueue a webfont.
 	 *
-	 * @param array $font The font arguments.
-	 * @return string
+	 * @param string     $id The unique identifier for the webfont.
+	 * @param array|null $font The font arguments.
 	 */
-	public function get_font_id( $font ) {
-		return sanitize_title( "{$font['font-family']}-{$font['font-weight']}-{$font['font-style']}-{$font['provider']}" );
+	public function enqueue_font( $id, $font = null ) {
+		if ( ! $id ) {
+			trigger_error( __( 'An ID is necessary when enqueueing a webfont.', 'gutenberg' ) );
+			return false;
+		}
+
+		if ( $font ) {
+			$font                           = $this->validate_font( $font );
+			self::$enqueued_webfonts[ $id ] = $font;
+
+			if ( isset( self::$registered_webfonts[ $id ] ) ) {
+				unset( self::$registered_webfonts[ $id ] );
+			}
+		} elseif ( isset( self::$registered_webfonts[ $id ] ) ) {
+			self::$enqueued_webfonts[ $id ] = self::$registered_webfonts[ $id ];
+
+			unset( self::$registered_webfonts[ $id ] );
+		} else {
+			trigger_error( __( 'The given webfont ID is not registered, therefore the webfont cannot be enqueued.', 'gutenberg' ) );
+		}
 	}
 
 	/**
@@ -203,7 +244,7 @@ class WP_Webfonts {
 	 */
 	public function generate_and_enqueue_styles() {
 		// Generate the styles.
-		$styles = $this->generate_styles();
+		$styles = $this->generate_styles( $this->get_enqueued_fonts() );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -222,8 +263,9 @@ class WP_Webfonts {
 	 * Generate and enqueue editor styles.
 	 */
 	public function generate_and_enqueue_editor_styles() {
+		$all_webfonts = array_merge( $this->get_registered_fonts(), $this->get_enqueued_fonts() );
 		// Generate the styles.
-		$styles = $this->generate_styles();
+		$styles = $this->generate_styles( $all_webfonts );
 
 		// Bail out if there are no styles to enqueue.
 		if ( '' === $styles ) {
@@ -238,16 +280,17 @@ class WP_Webfonts {
 	 *
 	 * @since 6.0.0
 	 *
+	 * @param array $webfonts The fonts that are going to the output.
+	 *
 	 * @return string $styles Generated styles.
 	 */
-	public function generate_styles() {
+	public function generate_styles( $webfonts ) {
 		$styles    = '';
 		$providers = $this->get_providers();
 
 		// Group webfonts by provider.
 		$webfonts_by_provider = array();
-		$registered_webfonts  = $this->get_fonts();
-		foreach ( $registered_webfonts as $id => $webfont ) {
+		foreach ( $webfonts as $id => $webfont ) {
 			$provider = $webfont['provider'];
 			if ( ! isset( $providers[ $provider ] ) ) {
 				/* translators: %s is the provider name. */
