@@ -6,6 +6,16 @@
  */
 
 /**
+ * Generates a font id based on the provided font object.
+ *
+ * @param array $font The font object.
+ * @return string
+ */
+function gutenberg_generate_font_id( $font ) {
+	return sanitize_title( "{$font['font-family']}-{$font['font-weight']}-{$font['font-style']}-{$font['provider']}" );
+}
+
+/**
  * Register webfonts defined in theme.json.
  */
 function gutenberg_register_webfonts_from_theme_json() {
@@ -58,7 +68,8 @@ function gutenberg_register_webfonts_from_theme_json() {
 		}
 	}
 	foreach ( $webfonts as $webfont ) {
-		wp_webfonts()->register_font( $webfont );
+		$id = isset( $webfont['id'] ) ? $webfont['id'] : gutenberg_generate_font_id( $webfont );
+		wp_register_webfont( $id, $webfont );
 	}
 }
 
@@ -70,7 +81,7 @@ function gutenberg_register_webfonts_from_theme_json() {
  * @return array The global styles with missing fonts data.
  */
 function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
-	$font_families_registered = wp_webfonts()->get_fonts();
+	$font_families_registered = wp_webfonts()->get_registered_fonts();
 	$font_families_from_theme = array();
 	if ( ! empty( $data['settings'] ) && ! empty( $data['settings']['typography'] ) && ! empty( $data['settings']['typography']['fontFamilies'] ) ) {
 		$font_families_from_theme = $data['settings']['typography']['fontFamilies'];
