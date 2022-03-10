@@ -834,13 +834,18 @@ describe( 'Multi-block selection', () => {
 
 	it( 'should forward delete across blocks', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '1[[' );
+		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '.' );
 		await page.keyboard.press( 'Enter' );
+		// "## " creates h2.
 		await page.keyboard.type( '## ]2' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 
 		// Test setup.
@@ -854,14 +859,18 @@ describe( 'Multi-block selection', () => {
 
 	it( 'should handle Enter across blocks', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '1[[' );
+		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'a' );
+		await page.keyboard.type( '.' );
 		await page.keyboard.press( 'Enter' );
+		// "## " creates h2.
 		await page.keyboard.type( '## ]2' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+		// Select everything between [].
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 
 		// Test setup.
