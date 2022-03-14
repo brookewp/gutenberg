@@ -251,9 +251,9 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ul>
+				<ol>
 					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ul>
+				</ol>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }
