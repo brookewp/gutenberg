@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `ColorPalette`: : refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
+-   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
 
 ## 19.6.0 (2022-03-11)
 
